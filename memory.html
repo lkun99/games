@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'  />
+<title>Memory</title>
+<style>
+</style>
+</head>
+<body>
+<script>
+
+
+function memory(){
+	function sflarr(array) {
+   		for (var p = array.length - 1; p > 0; p--) {
+      		var l = Math.floor(Math.random() * (p + 1));
+        		var tmp = array[p];
+        	array[p] = array[l];
+        array[l] = tmp;
+    }
+}
+function preper(){
+	pic_arr =[];
+		for(i=1;i<9;i++){
+			pic_arr.push(i.toString());
+			pic_arr.push(i.toString());
+		}
+		div_mem = document.createElement("div");
+		div_mem.setAttribute("style","text-align:center;");
+		div_mem.id="div_mem";
+		table = document.createElement("table");
+		table.setAttribute("style","border: 3px solid black;margin-left:27%;width: 600px;")
+		table.id = "table";
+		div_mem.appendChild(table);
+			for(v=1;v<5;v++){
+				var line = document.createElement("tr");
+				line.id = "line_"+v;
+					for(i=1;i<5;i++){
+						var cell = document.createElement("td");
+						cell.id = "cell_"+v+"_"+i;
+						cell.setAttribute("style","border: 3px solid black;padding: 0;")
+						sflarr(pic_arr);
+						los = pic_arr.pop();
+						pic = '<img id="img_'+v+'_'+i+'" src="img/'+los.toString()+'.svg" width="120" height="120" type="image/svg+xml" />'
+						cell.innerHTML = pic;
+						cell.onclick = function(){ show(this)};
+						line.appendChild(cell);
+					}
+					table.appendChild(line);
+					}
+				div_score = document.createElement("div");
+			div_score.id = "div_score";
+		div_score.setAttribute("style","background-color:#3366FF;color:white;font-size:32px;font-family:tahoma;float:right;");
+	document.body.appendChild(div_score);
+document.body.appendChild(div_mem);
+}
+	sec = 10;
+		counter = document.createElement("div");
+			counter.id = "counter";
+		counter.setAttribute("style","color:red; font-size:22px;font-family:tahoma;text-align:center;")
+	document.body.appendChild(counter);
+function odliczanie(){
+	if(sec>4) document.getElementById("counter").innerHTML = "Zostało: "+sec+" sekund.";
+	if (sec==1) document.getElementById("counter").innerHTML = "Została: "+sec+" sekunda";
+	if(sec<=0){ 
+		clearInterval(count);
+		document.getElementById("counter").setAttribute("style","visibility:hidden;");
+		black();
+		show_score();
+		allow = true;
+	}
+	if(sec>1&&sec<5) document.getElementById("counter").innerHTML = "Zostały: "+sec+" sekundy.";
+	sec--;
+}
+count = setInterval(odliczanie,1000);
+preper();
+clicked_cells=[];
+corr_cells=[];
+score = 0;
+corr_cells_ids = [];
+var minutes = 10;
+var seconds = 0;
+function show(x){
+if(!allow) return 0;
+	id = x.id;
+	img_id = "img"+id.substr(4);
+	clicked_cells.push(img_id);
+	clicked_cells.push(id);
+	sec_show = 5;
+	if(clicked_cells.length>4){
+		sec_show = 0;
+		return 0;
+		}
+	if(clicked_cells.length==4){
+		clearInterval(timer);
+		clk_1 = document.getElementById(clicked_cells[0]).getAttribute("src");
+		clk_2 = document.getElementById(clicked_cells[2]).getAttribute("src");
+			if((clk_1==clk_2)&&(clicked_cells[1]!=clicked_cells[3])){
+				score++
+				corr_cells_ids.push(clicked_cells[1]);
+				corr_cells_ids.push(clicked_cells[3]);
+				if(score==8) setTimeout(function(){game_over("win")},1000);
+				}
+			sec_show = 0;
+			}
+	document.getElementById(img_id).setAttribute("style","visibility:visible;");
+	document.getElementById(id).setAttribute("style","background-color:white; border: 1px solid black;padding: 0;");
+	document.getElementById("counter").setAttribute("style","visibility:visible;")
+	document.getElementById("counter").innerHTML = "Zostało: "+sec_show+" sekund.";
+timer  = setInterval(function(){
+	if(sec_show<1) {
+		clicked_cells =[];
+		document.getElementById("counter").setAttribute("style","visibility:hidden;")
+		black();
+			clearInterval(timer);
+			return 0;
+		}
+		sec_show--;
+		if (sec_show>1) document.getElementById("counter").innerHTML = "Zostały: "+sec_show+" sekundy.";
+		if (sec_show==1) document.getElementById("counter").innerHTML = "Została: "+sec_show+" sekunda."
+		if (sec_show==0) document.getElementById("counter").innerHTML = "Zostało: "+sec_show+" sekund."
+	},1000);
+}
+function black(){
+	for(v=1;v<5;v++){
+		for(i=1;i<5;i++){
+			id = "cell_"+v+"_"+i;
+			img_id = "img_"+v+"_"+i;
+				exist = corr_cells_ids.indexOf(id);
+					if(exist>=0) continue;
+					else{
+					document.getElementById(img_id).setAttribute("style","visibility:hidden;")
+				document.getElementById(id).setAttribute("style","background-color:black;");
+			}
+		}
+	}
+}
+function game_over(x){
+	result = x;
+		div_over = document.createElement("div");
+			div_over.setAttribute("style","postion:absolute; z-index:3; background-color:white; margin:0 auto; text-align:center; color: red; font-size:52px; height:60%;width:50%;		font-family:verdana; line-height:200px;");
+					if(result=="lose"){
+						div_over.innerHTML = "PRZEGRANA";
+						}
+						else{
+							div_over.innerHTML = "WYGRANA";
+						}
+						div_over.innerHTML+= "<br>Czas gry: "+ (9 - minutes) +":"+(60 - seconds);
+					document.body.setAttribute("style","position: absolute; left: 0; top:0; width: 100%; height: 100%; background-color: #7E7E7E; z-index:-1; opacity: .5; filter: alpha(opacity=50);margin:0;padding:0;");
+					document.getElementById("div_mem").remove();
+				document.getElementById("div_score").remove();
+			document.getElementById("counter").remove();
+		clearInterval(score_show);
+	document.body.appendChild(div_over);
+}
+function show_score(){
+		score_show = setInterval(function(){
+			if(score==0||score>4) punkty =" punktów";
+				else if(score==1) punkty=" punkt";
+					else punkty = " punkty";
+						document.getElementById("div_score").innerHTML = "Wynik: " + score + punkty;
+								if(minutes==0 && seconds==0) {
+									game_over("lose");
+									clearInterval(score_show);
+								}
+								if(seconds<0){
+									minutes--;
+									seconds = 59;
+							document.getElementById("div_score").innerHTML += "<br><br> Pozostały czas: " +minutes+" : "+seconds;
+							}
+						else if(seconds>=0 && seconds<10){
+					document.getElementById("div_score").innerHTML += "<br><br> Czas gry: " +minutes+" : "+"0"+seconds;
+					}
+				else{
+			document.getElementById("div_score").innerHTML += "<br><br> Pozostały czas: " +minutes+" : "+seconds;
+		}
+	seconds--;
+},1000);
+}
+}
+memory();
+</script>
+</body>
+</html>

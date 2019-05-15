@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body{
+	background-color: #936c6c;
+}
+#container{
+	margin: 0 auto;
+	text-align:center;
+}
+</style>
+</head>
+<title>Snake</title>
+<body>
+<div id="container">
+<canvas id="c" width="600" height="600"></canvas>
+</div>
+<script>
+	window.onload=function() {
+		cvs = document.getElementById("c");
+		ctx = cvs.getContext("2d");
+		document.addEventListener("keydown",key_action);
+		inter = setInterval(start,1000/15);
+	}
+	px=10;
+	py=10;
+	k_bok=20;
+	field=30;
+	ax=25;
+	ay=25;
+	x=0;
+	y=0;
+	snake=[];
+	last=0;
+	tail=5;
+
+	function start(){ 
+		px += x;
+		py += y;
+		if(px<0) { //obsługa zderzeń - lewa
+			px = field-1;
+		}
+		if(px>field-1) { //obsługa zderzeń - prawa
+			px = 0;
+		}
+		if(py<0) { //obsługa zderzeń - dół
+			py = field-1;
+		}
+		if(py>field-1) { //obsługa zderzeń - góra
+			py = 0;
+		}
+	ctx.fillStyle="black";
+	ctx.fillRect(0,0,cvs.width,cvs.height); // rysowanie tła
+	
+	ctx.fillStyle="white"; 
+	for(var i=0; i<snake.length; i++){ // rysowanie snake'a
+		snake_x = snake[i].x*k_bok; // współrzędne X głowy
+		snake_y = snake[i].y*k_bok; // współrzędne Y głowy  
+		
+		ctx.fillRect(snake_x,snake_y,k_bok-1,k_bok-1);
+		if(snake[i].x == px && snake[i].y == py){
+			if (tail == 5){
+
+			}
+			else {
+				clearInterval(inter);
+				ctx.fillStyle="black";
+				ctx.fillRect(0,0,cvs.width,cvs.height);
+				ctx.fillStyle="red";
+				ctx.font = "24px Arial";
+				ctx.fillText("Game over! ",230,260);
+				setTimeout(function(){
+			   	 con = confirm("Czy chcesz zagrać ponownie?")
+				if(con) location.reload();
+				}, 1000);
+			}
+		}
+	}
+	new_x_y={ //obiekt z nowymi parametrami x y
+		x:px,
+		y:py
+	}
+	snake.push(new_x_y);
+	while(snake.length>tail) {
+		snake.shift(); //ucinanie ostatniego kwadratu z ogona
+	}
+
+	if(ax==px && ay==py){ //zetknięcię z punktem
+			tail+=1; 
+			//losowanie położenia punktu
+			ax=Math.floor(Math.random()*field);
+			ay=Math.floor(Math.random()*field);
+		}
+	ctx.fillStyle="red";
+	ctx.fillRect(ax*k_bok,ay*k_bok,k_bok-1,k_bok-1);
+	ctx.fillStyle="lime";
+	ctx.font = "12px Arial";
+	ctx.fillText("Score: "+(tail-5),10,590);
+	}
+
+
+	function key_action(code){
+		key = code.keyCode;
+		console.log(key);
+		if ((last==37&&key==39)||(last==39&&key==37)||(last==38&&key==40)||(last==40&&key==38)){
+			console.log("error")
+		}
+		else{
+			last = key;
+				switch(key) {
+				case 37: //left
+				x=-1;
+				y=0;
+				break;
+				case 38: //up
+				x=0;
+				y=-1;
+				break;
+				case 39: // right 
+				x=1;
+				y=0;
+				break;
+				case 40: //down 
+				x=0;
+				y=1;
+				break;
+			}
+		}
+	}
+
+</script>
+</body>
+</html>
